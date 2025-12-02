@@ -1,0 +1,103 @@
+name: containerized-monitoring-services
+
+networks:
+  monitoring_network:
+    driver: bridge
+
+volumes:
+  grafana_data:
+  prometheus_data:
+  alertmanager_data:
+
+services:
+  prometheus:
+    image: prom/prometheus:v3.7.2
+    container_name: prometheus
+    deploy:
+      resources:
+        limits:
+          cpus: "0.125"
+          memory: "250M"
+    networks:
+      - monitoring_network
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/alert.rules.yml:/etc/prometheus/alert.rules.yml
+      - prometheus_data:/prometheus
+    restart: always
+
+  alertmanager:
+    image: prom/alertmanager:v0.28.0
+    container_name: alertmanager
+    deploy:
+      resources:
+        limits:
+          cpus: "0.05"
+          memory: "50M"
+    networks:
+      - monitoring_network
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+      - alertmanager_data:/alertmanager
+    restart: always
+
+  grafana:
+    image: grafana/grafana-enterprise:12.2.0
+    container_name: grafana
+    deploy:
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: "250M"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=secret
+    networks:
+      - monitoring_network
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    restart: unless-stopped
+
+  node_exporter:
+    image: prom/node-exporter:v1.8.2
+    container_name: node_exporter
+    deploy:
+      resources:
+        limits:
+          cpus: "0.05"
+          memory: "50M"
+    networks:
+      - monitoring_network
+    ports:
+      - "9100:9100"
+    restart: always
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.49.2
+    container_name: cadvisor
+    deploy:
+      resources:
+        limits:
+          cpus: "0.05"
+          memory: "100M"
+    networks:
+      - monitoring_network
+    ports:
+      - "8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      # - /var/run/docker.sock:/var/run/docker.sock:ro
+      # - /var/lib/docker/:/var/lib/docker:ro
+      - /run/podman:/run/podman:ro
+      - /var/lib/containers:/var/lib/containers:ro
+    privileged: true
+    restart: always
