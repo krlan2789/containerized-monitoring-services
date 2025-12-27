@@ -1,12 +1,12 @@
 ---
-title: "Monitoring Service (Containerization)"
+title: "Monitoring Service with Prometheus and Grafana (Containerization)"
 description: "Setup guide for containerized monitoring services using Docker/Podman with Prometheus, Grafana, AlertManager, Node Exporter, and cAdvisor."
 date: "2025-12-01"
 tags: ["container","docker","podman","compose","prometheus","grafana","alertmanager","node-exporter","cadvisor","monitoring"]
 github: "https://github.com/krlan2789/containerized-monitoring-services"
 ---
 
-# 1. Monitoring Services (Containerization)
+# 1. Monitoring Service with Prometheus and Grafana (Containerization)
 
 ## 1.1. Compose Project (Container Manager - Podman/Docker)
 
