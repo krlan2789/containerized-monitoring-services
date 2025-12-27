@@ -18,16 +18,16 @@ Create a file with name `docker-compose.yml`.
 
 Configuration that can be used by all services.
 
-```yml
-networks:
-	monitoring_network:
-		driver: bridge
-
-volumes:
-	grafana_data:
-	prometheus_data:
-	alertmanager_data:
-```
+	```yml
+	networks:
+		monitoring_network:
+			driver: bridge
+	
+	volumes:
+		grafana_data:
+		prometheus_data:
+		alertmanager_data:
+	```
 
 #### 1.1.1.2. Prometheus Service
 
@@ -63,27 +63,27 @@ volumes:
 	global:
 		scrape_interval: 15s
 		evaluation_interval: 15s
-
+	
 	scrape_configs:
 		- job_name: 'monitoring_targets'
 			static_configs:
 				- targets: ['192.168.1.15:8765', 'grafana:3000']
-
+	
 		- job_name: 'node_exporter'
 			static_configs:
 				- targets: ['node_exporter:9100']
 					labels:
 						nodename: 'main-server'
-
+	
 		- job_name: 'cadvisor'
 			static_configs:
 				- targets: ['cadvisor:8080']
-
+	
 	alerting:
 		alertmanagers:
 			- static_configs:
-					- targets: ['alertmanager:9093']
-
+				- targets: ['alertmanager:9093']
+	
 	rule_files:
 		- "alert.rules.yml"
 	```
@@ -94,23 +94,23 @@ volumes:
 	groups:
 		- name: node_alerts
 			rules:
-			- alert: High Memory Usage (Instance - Critical)
-				expr: node_memory_MemAvailable_bytes{nodename="main-server"} / node_memory_MemTotal_bytes{nodename="main-server"} < 0.1
-				for: 10m
-				labels:
-					severity: critical
-				annotations:
-					summary: "Low memory on {{ $labels.nodename }}"
-					description: "Memory available < 10% for 10 minutes on {{ $labels.instance }}"
-
-			- alert: High Memory Usage (Container - Warning)
-				expr: container_memory_usage_bytes{container!="",pod!=""} > 1024000000
-				for: 5m
-				labels:
-					severity: warning
-				annotations:
-					summary: "High memory usage in container {{ $labels.container }}"
-					description: "Container {{ $labels.container }} is using > 1024MB memory for 5 minutes"
+				- alert: High Memory Usage (Instance - Critical)
+					expr: node_memory_MemAvailable_bytes{nodename="main-server"} / node_memory_MemTotal_bytes{nodename="main-server"} < 0.1
+					for: 10m
+					labels:
+						severity: critical
+					annotations:
+						summary: "Low memory on {{ $labels.nodename }}"
+						description: "Memory available < 10% for 10 minutes on {{ $labels.instance }}"
+	
+				- alert: High Memory Usage (Container - Warning)
+					expr: container_memory_usage_bytes{container!="",pod!=""} > 1024000000
+					for: 5m
+					labels:
+						severity: warning
+					annotations:
+						summary: "High memory usage in container {{ $labels.container }}"
+						description: "Container {{ $labels.container }} is using > 1024MB memory for 5 minutes"
 	```
 
 #### 1.1.1.3. Alert Manager Service
@@ -150,7 +150,7 @@ volumes:
 		smtp_smarthost: '$SMTP_HOST'
 		smtp_auth_username: '$SMTP_USER'
 		smtp_auth_password: '$SMTP_PASS'
-
+	
 	route:
 		group_by: ['alertname', 'nodename']
 		group_wait: 30s
@@ -164,19 +164,19 @@ volumes:
 			- match:
 					severity: warning
 				receiver: 'email-team'
-
-	receivers:
-		- name: 'email-team'
-			email_configs:
-				- to: '$ALERT_EMAIL'
-					send_resolved: true
-
-		- name: 'telegram-alerts'
-			telegram_configs:
-				- bot_token: '$TELEGRAM_BOT_TOKEN'
-					chat_id: $TELEGRAM_GROUP_CHAT_ID
-					message: '{{ template "default" . }}'
-					send_resolved: true
+	
+		receivers:
+			- name: 'email-team'
+				email_configs:
+					- to: '$ALERT_EMAIL'
+						send_resolved: true
+	
+			- name: 'telegram-alerts'
+				telegram_configs:
+					- bot_token: '$TELEGRAM_BOT_TOKEN'
+						chat_id: $TELEGRAM_GROUP_CHAT_ID
+						message: '{{ template "default" . }}'
+						send_resolved: true
 	```
 
 #### 1.1.1.4. Grafana Service
@@ -184,7 +184,7 @@ volumes:
 - Main monitoring dashboard.
 - Visualize some metrics collected by Prometheus.
 
-1. Grafana configuration in `docker-compose.yml`
+1. Grafana configuration in `docker-compose.yml`:
 
 	```yml
 	services:
@@ -212,7 +212,7 @@ volumes:
 
 - Instance's resources usage (CPU, RAM, Network, etc.) provider, then collected by Prometheus and visualized by Grafana.
 
-1. Node Exporter configuration in `docker-compose.yml`
+1. Node Exporter configuration in `docker-compose.yml`:
 
 	```yml
 	services:
