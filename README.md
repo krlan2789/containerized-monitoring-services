@@ -18,16 +18,16 @@ Create a file with name `docker-compose.yml`.
 
 Configuration that can be used by all services.
 
-	```yml
-	networks:
-		monitoring_network:
-			driver: bridge
-	
-	volumes:
-		grafana_data:
-		prometheus_data:
-		alertmanager_data:
-	```
+```yml
+networks:
+	monitoring_network:
+		driver: bridge
+
+volumes:
+	grafana_data:
+	prometheus_data:
+	alertmanager_data:
+```
 
 #### 1.1.1.2. Prometheus Service
 
