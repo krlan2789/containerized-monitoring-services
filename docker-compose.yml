@@ -1,4 +1,4 @@
-name: containerized-monitoring-services
+name: shared-monitoring-services
 
 networks:
   monitoring_network:
@@ -59,7 +59,7 @@ services:
     networks:
       - monitoring_network
     ports:
-      - "3000:3000"
+      - "3456:3000"
     volumes:
       - grafana_data:/var/lib/grafana
     restart: unless-stopped
